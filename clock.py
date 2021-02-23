@@ -6,157 +6,33 @@ from PyQt5.QtMultimedia import QSound
 import sys
 
 
-class Window(QMainWindow):
+class TimerWidget(QWidget):
 
     def __init__(self):
         super().__init__()
 
-        self.title = "Clock App"
-        self.window_icon = "timer_assets/timer.png"
         self.play_icon = "timer_assets/play.png"
         self.pause_icon = "timer_assets/pause.png"
         self.reset_icon = "timer_assets/reset.png"
         self.alarm_sound = "timer_assets/alarm.wav"
 
-        # STOPWATCH
-        self.stopwatch_time = QTime(0, 0, 0, 0)
-        self.stopwatch_is_running = False
-
-        self.stopwatch = QTimer()
-        self.stopwatch.timeout.connect(self.update_stopwatch)
-        # # # # # #
-
-        # TIMER
         self.timer_duration = QTime(0, 5, 0)
         self.zero_time = QTime(0, 0, 0)
         self.timer_is_running = False
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_timer)
-        # # # # # #
 
         self.init_window()
 
     def init_window(self):
-        self.setGeometry(100, 100, 300, 270)
-        self.setWindowTitle(self.title)
-        self.setWindowIcon(QIcon("timer_assets/timer.png"))
 
-        # STOPWATCH WIDGETS
-        self.stopwatch_vbox = self.create_stopwatch_window()
-
-        self.stopwatch_main_widget = QWidget()
-        self.stopwatch_main_widget.setLayout(self.stopwatch_vbox)
-        # # # # # # # # # #
-
-        # TIMER WIDGETS
         self.stack = QStackedLayout()
         self.stack.addWidget(self.create_timer_window())
         self.stack.addWidget(self.create_change_time_window())
 
-        self.timer_main_widget = QWidget()
-        self.timer_main_widget.setLayout(self.stack)
-        # # # # # # # # # #
+        self.setLayout(self.stack)
 
-        self.create_tab_layout()
-
-    def create_tab_layout(self):
-
-        self.tab_widget = QTabWidget()
-        self.tab_widget.setFont(QFont("Arial", 10))
-        self.tab_widget.setStyleSheet("""QTabBar::tab {
-            width: 150px;
-            height: 30px 
-        }""")
-        self.tab_widget.addTab(self.timer_main_widget, "Timer")
-        self.tab_widget.addTab(self.stopwatch_main_widget, "Stopwatch")
-
-        self.vbox = QVBoxLayout()
-        self.vbox.addWidget(self.tab_widget)
-        self.vbox.setContentsMargins(0, 0, 0, 0)
-
-        self.center_widget = QWidget()
-        self.center_widget.setLayout(self.vbox)
-        self.setCentralWidget(self.center_widget)
-
-    # STOPWATCH
-    def create_stopwatch_window(self):
-
-        self.stopwatch_time_label = QLabel(self.stopwatch_time.toString("hh:mm:ss.zz"))
-        self.stopwatch_time_label.setAlignment(Qt.AlignCenter)
-        self.stopwatch_time_label.setFont(QFont("Arial", 20))
-
-        self.reset_stopwatch_button = QPushButton()
-        self.reset_stopwatch_button.setIcon(QIcon(self.reset_icon))
-        self.reset_stopwatch_button.setFixedWidth(200)
-        self.reset_stopwatch_button.clicked.connect(self.reset_stopwatch)
-
-        self.toggle_stopwatch_button = QPushButton()
-        self.toggle_stopwatch_button.setIcon(QIcon(self.play_icon))
-        self.toggle_stopwatch_button.setFixedWidth(200)
-        self.toggle_stopwatch_button.clicked.connect(self.toggle_stopwatch)
-
-        self.vbox = QVBoxLayout()
-        self.vbox.addWidget(self.stopwatch_time_label)
-        self.vbox.addWidget(self.reset_stopwatch_button, alignment=Qt.AlignHCenter)
-        self.vbox.addWidget(self.toggle_stopwatch_button, alignment=Qt.AlignHCenter)
-        self.vbox.addSpacing(20)
-
-        return self.vbox
-
-    def display_stopwatch_time(self):
-        # msec displays the hundreds and tens place only
-
-        msec = str(int(self.stopwatch_time.msec() / 10))
-        self.stopwatch_time_label.setText(self.stopwatch_time.toString(f"hh:mm:ss.{msec.ljust(2, '0')}"))
-
-    def toggle_stopwatch(self):
-        # starts stopwatch if it's not running or
-        # stops stopwatch if it is running
-
-        if self.stopwatch_is_running:
-            self.stopwatch_is_running = False
-            self.change_stopwatch_button_logo("start")
-            self.stop_stopwatch()
-        else:
-            self.stopwatch_is_running = True
-            self.change_stopwatch_button_logo("pause")
-            self.start_stopwatch()
-
-    # EFFECT
-    def change_stopwatch_button_logo(self, action):
-        # changes button logo
-
-        if action == "start":
-            self.toggle_stopwatch_button.setIcon(QIcon(self.play_icon))
-        elif action == "pause":
-            self.toggle_stopwatch_button.setIcon(QIcon(self.pause_icon))
-
-    def start_stopwatch(self):
-        # runs stopwatch
-
-        self.stopwatch.start(10)
-
-    def stop_stopwatch(self):
-        # stops stopwatch
-
-        self.stopwatch.stop()
-
-    def update_stopwatch(self):
-        # stopwatch's interval is every 10 ms so only the hundreds and tens digits are shown
-
-        self.stopwatch_time = self.stopwatch_time.addMSecs(10)
-        self.display_stopwatch_time()
-
-    def reset_stopwatch(self):
-        # resets stopwatch time to zero
-
-        self.stopwatch_time = QTime(0, 0, 0, 0)
-        self.display_stopwatch_time()
-
-    # # # # # # # # # # # # # #
-
-    # TIMER
     def change_window(self, index):
         self.stack.setCurrentIndex(index)
 
@@ -369,7 +245,148 @@ class Window(QMainWindow):
         self.set_time_button.setStyleSheet("background-color: light grey")
 
 
-App = QApplication(sys.argv)
-window = Window()
-window.show()
-sys.exit(App.exec())
+class StopwatchWidget(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.window_icon = "timer_assets/timer.png"
+        self.play_icon = "timer_assets/play.png"
+        self.pause_icon = "timer_assets/pause.png"
+        self.reset_icon = "timer_assets/reset.png"
+
+        self.stopwatch_time = QTime(0, 0, 0, 0)
+        self.stopwatch_is_running = False
+
+        self.stopwatch = QTimer()
+        self.stopwatch.timeout.connect(self.update_stopwatch)
+
+        self.init_window()
+
+    def init_window(self):
+
+        self.stopwatch_vbox = self.create_stopwatch_window()
+        self.setLayout(self.stopwatch_vbox)
+
+    # STOPWATCH
+    def create_stopwatch_window(self):
+
+        self.stopwatch_time_label = QLabel(self.stopwatch_time.toString("hh:mm:ss.zz"))
+        self.stopwatch_time_label.setAlignment(Qt.AlignCenter)
+        self.stopwatch_time_label.setFont(QFont("Arial", 20))
+
+        self.reset_stopwatch_button = QPushButton()
+        self.reset_stopwatch_button.setIcon(QIcon(self.reset_icon))
+        self.reset_stopwatch_button.setFixedWidth(200)
+        self.reset_stopwatch_button.clicked.connect(self.reset_stopwatch)
+
+        self.toggle_stopwatch_button = QPushButton()
+        self.toggle_stopwatch_button.setIcon(QIcon(self.play_icon))
+        self.toggle_stopwatch_button.setFixedWidth(200)
+        self.toggle_stopwatch_button.clicked.connect(self.toggle_stopwatch)
+
+        self.vbox = QVBoxLayout()
+        self.vbox.addWidget(self.stopwatch_time_label)
+        self.vbox.addWidget(self.reset_stopwatch_button, alignment=Qt.AlignHCenter)
+        self.vbox.addWidget(self.toggle_stopwatch_button, alignment=Qt.AlignHCenter)
+        self.vbox.addSpacing(20)
+
+        return self.vbox
+
+    def display_stopwatch_time(self):
+        # msec displays the hundreds and tens place only
+
+        msec = str(int(self.stopwatch_time.msec() / 10))
+        self.stopwatch_time_label.setText(self.stopwatch_time.toString(f"hh:mm:ss.{msec.ljust(2, '0')}"))
+
+    def toggle_stopwatch(self):
+        # starts stopwatch if it's not running or
+        # stops stopwatch if it is running
+
+        if self.stopwatch_is_running:
+            self.stopwatch_is_running = False
+            self.change_stopwatch_button_logo("start")
+            self.stop_stopwatch()
+        else:
+            self.stopwatch_is_running = True
+            self.change_stopwatch_button_logo("pause")
+            self.start_stopwatch()
+
+    # EFFECT
+    def change_stopwatch_button_logo(self, action):
+        # changes button logo
+
+        if action == "start":
+            self.toggle_stopwatch_button.setIcon(QIcon(self.play_icon))
+        elif action == "pause":
+            self.toggle_stopwatch_button.setIcon(QIcon(self.pause_icon))
+
+    def start_stopwatch(self):
+        # runs stopwatch
+
+        self.stopwatch.start(10)
+
+    def stop_stopwatch(self):
+        # stops stopwatch
+
+        self.stopwatch.stop()
+
+    def update_stopwatch(self):
+        # stopwatch's interval is every 10 ms so only the hundreds and tens digits are shown
+
+        self.stopwatch_time = self.stopwatch_time.addMSecs(10)
+        self.display_stopwatch_time()
+
+    def reset_stopwatch(self):
+        # resets stopwatch time to zero
+
+        self.stopwatch_time = QTime(0, 0, 0, 0)
+        self.display_stopwatch_time()
+
+
+class Window(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+        self.title = "Clock"
+        self.window_icon = "timer_assets/timer.png"
+
+        self.init_window()
+
+    def init_window(self):
+
+        self.setGeometry(100, 100, 300, 270)
+        self.setWindowTitle(self.title)
+        self.setWindowIcon(QIcon(self.window_icon))
+
+        self.create_tab_layout()
+
+    def create_tab_layout(self):
+
+        self.tab_widget = QTabWidget()
+        self.tab_widget.setFont(QFont("Arial", 10))
+        self.tab_widget.setStyleSheet("""QTabBar::tab {
+            width: 150px;
+            height: 30px 
+        }""")
+
+        self.timer_widget = TimerWidget()
+        self.stopwatch_widget = StopwatchWidget()
+        self.tab_widget.addTab(self.timer_widget, "Timer")
+        self.tab_widget.addTab(self.stopwatch_widget, "Stopwatch")
+
+        self.vbox = QVBoxLayout()
+        self.vbox.addWidget(self.tab_widget)
+        self.vbox.setContentsMargins(0, 0, 0, 0)
+
+        self.center_widget = QWidget()
+        self.center_widget.setLayout(self.vbox)
+        self.setCentralWidget(self.center_widget)
+
+
+if __name__ == "__main__":
+    App = QApplication(sys.argv)
+    window = Window()
+    window.show()
+    sys.exit(App.exec())
