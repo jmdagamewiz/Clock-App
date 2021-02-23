@@ -6,15 +6,21 @@ from PyQt5.QtMultimedia import QSound
 import sys
 
 
-class TimerWidget(QWidget):
+class ClockAssets:
 
     def __init__(self):
-        super().__init__()
-
         self.play_icon = "timer_assets/play.png"
         self.pause_icon = "timer_assets/pause.png"
         self.reset_icon = "timer_assets/reset.png"
         self.alarm_sound = "timer_assets/alarm.wav"
+        self.window_icon = "timer_assets/timer.png"
+
+
+class TimerWidget(QWidget, ClockAssets):
+    # widget containing the timer and all methods associated with it
+
+    def __init__(self):
+        super().__init__()
 
         self.timer_duration = QTime(0, 5, 0)
         self.zero_time = QTime(0, 0, 0)
@@ -245,7 +251,8 @@ class TimerWidget(QWidget):
         self.set_time_button.setStyleSheet("background-color: light grey")
 
 
-class StopwatchWidget(QWidget):
+class StopwatchWidget(QWidget, ClockAssets):
+    # widget containing stopwatch and all methods associated with it
 
     def __init__(self):
         super().__init__()
@@ -344,13 +351,12 @@ class StopwatchWidget(QWidget):
         self.display_stopwatch_time()
 
 
-class Window(QMainWindow):
+class Window(QMainWindow, ClockAssets):
 
     def __init__(self):
         super().__init__()
 
         self.title = "Clock"
-        self.window_icon = "timer_assets/timer.png"
 
         self.init_window()
 
