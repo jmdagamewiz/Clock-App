@@ -7,6 +7,7 @@ import sys
 
 
 class ClockAssets:
+    # class containing all assets for the app in one
 
     def __init__(self):
         self.play_icon = "timer_assets/play.png"
@@ -44,6 +45,16 @@ class TimerWidget(QWidget, ClockAssets):
 
         if self.stack.currentIndex() == 0:
             self.display_timer_time()
+            self.change_timer_button_logo("play")
+
+            if self.timer_duration == self.zero_time:
+                self.toggle_timer_button.setDisabled(True)
+            else:
+                self.toggle_timer_button.setDisabled(False)
+
+        elif self.stack.currentIndex() == 1:
+            # stops timer if user goes to change_time window
+            self.stop_timer()
 
     # WINDOW
     def create_timer_window(self):
@@ -93,7 +104,7 @@ class TimerWidget(QWidget, ClockAssets):
     # EFFECT
     def change_timer_button_logo(self, action):
 
-        if action == "start":
+        if action == "play":
             self.toggle_timer_button.setIcon(QIcon(self.play_icon))
         elif action == "pause":
             self.toggle_timer_button.setIcon(QIcon(self.pause_icon))
@@ -111,7 +122,7 @@ class TimerWidget(QWidget, ClockAssets):
 
         if self.timer_is_running:
             self.timer_is_running = False
-            self.change_timer_button_logo("start")
+            self.change_timer_button_logo("play")
             self.stop_timer()
         else:
             # resume playing timer
@@ -137,7 +148,7 @@ class TimerWidget(QWidget, ClockAssets):
         if self.timer_time == self.zero_time:
             self.stop_timer()
             self.timer_is_running = False
-            self.change_timer_button_logo("start")
+            self.change_timer_button_logo("play")
             self.toggle_timer_button.setDisabled(True)
             self.play_alarm_sound_effect()
 
@@ -312,7 +323,7 @@ class StopwatchWidget(QWidget, ClockAssets):
 
         if self.stopwatch_is_running:
             self.stopwatch_is_running = False
-            self.change_stopwatch_button_logo("start")
+            self.change_stopwatch_button_logo("play")
             self.stop_stopwatch()
         else:
             self.stopwatch_is_running = True
@@ -323,7 +334,7 @@ class StopwatchWidget(QWidget, ClockAssets):
     def change_stopwatch_button_logo(self, action):
         # changes button logo
 
-        if action == "start":
+        if action == "play":
             self.toggle_stopwatch_button.setIcon(QIcon(self.play_icon))
         elif action == "pause":
             self.toggle_stopwatch_button.setIcon(QIcon(self.pause_icon))
@@ -352,6 +363,7 @@ class StopwatchWidget(QWidget, ClockAssets):
 
 
 class Window(QMainWindow, ClockAssets):
+    # main window of clock app that contains tab layout
 
     def __init__(self):
         super().__init__()
