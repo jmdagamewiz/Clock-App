@@ -5,6 +5,8 @@ from PyQt5.QtCore import QTimer, QTime, Qt
 from PyQt5.QtMultimedia import QSound
 import sys
 
+# TODO: change input method in change_time_window for Timer tab to scroll wheel(?) (scrollable QListWidget)
+
 
 class ClockAssets:
     # class containing all assets for the app in one
@@ -46,11 +48,7 @@ class TimerWidget(QWidget, ClockAssets):
         if self.stack.currentIndex() == 0:
             self.display_timer_time()
             self.change_timer_button_logo("play")
-
-            if self.timer_duration == self.zero_time:
-                self.toggle_timer_button.setDisabled(True)
-            else:
-                self.toggle_timer_button.setDisabled(False)
+            self.toggle_timer_button.setDisabled(False)
 
         elif self.stack.currentIndex() == 1:
             # stops timer if user goes to change_time window
@@ -237,11 +235,15 @@ class TimerWidget(QWidget, ClockAssets):
 
         if hours >= 0 and minutes >= 0 and seconds >= 0:
             if hours < 24 and minutes < 60 and seconds < 60:
-                self.timer_duration = QTime(hours, minutes, seconds)
-                self.change_window(0)
 
-                self.timer_time = self.timer_duration
-                self.display_timer_time()
+                if hours == 0 and minutes == 0 and seconds == 0:
+                    self.show_button_effect()
+                else:
+                    self.timer_duration = QTime(hours, minutes, seconds)
+                    self.change_window(0)
+
+                    self.timer_time = self.timer_duration
+                    self.display_timer_time()
             else:
                 # button turns red to give user feedback
                 self.show_button_effect()
@@ -375,6 +377,7 @@ class Window(QMainWindow, ClockAssets):
     def init_window(self):
 
         self.setGeometry(100, 100, 300, 270)
+        self.setFixedSize(300, 270)
         self.setWindowTitle(self.title)
         self.setWindowIcon(QIcon(self.window_icon))
 
